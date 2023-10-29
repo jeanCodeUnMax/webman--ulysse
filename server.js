@@ -24,7 +24,7 @@ db.serialize(() => {
       console.log('Table créée avec succès');
 
       const insertDataQuery = `
-        INSERT INTO users (username, password)
+        INSERT INTO  users (username, password)
         VALUES ('john', 'password123'),
                ('jane', 'password456')
       `;
@@ -56,6 +56,21 @@ app.get('/users', (req, res) => {
   });
 });
 
+
+app.delete('/users', (req, res) => {
+  const deleteDataQuery = 'DELETE FROM users';
+
+  db.run(deleteDataQuery, (error) => {
+    if (error) {
+      console.error('Erreur lors de la suppression des données :', error.message);
+      res.status(500).json({ error: 'Erreur lors de la suppression des données' });
+    } else {
+      res.status(200).json({ message: "Les utilisateurs ont été effacés de la table USERS." });
+      console.log("Les utilisateurs ont été effacés de la table USERS.");
+    }
+  });
+});
+
 app.get("/titi/:name", (req, res) => {
   let name = req.params.name; 
 
@@ -65,10 +80,10 @@ app.get("/titi/:name", (req, res) => {
 });
 
 app.post("/toto", (req, res) => {
-  console.log(req.ip); 
-  console.log(req.hostname); 
-  console.log(req.body);
-  console.log(req.headers); 
+  console.log(req); 
+  // console.log(req.hostname); 
+  // console.log(req.body);
+  // console.log(req.headers); 
   res.json(req.body); 
 })
 
