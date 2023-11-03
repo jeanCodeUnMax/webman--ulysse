@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 // Configurer les en-têtes CORS pour autoriser uniquement votre adresse IP locale
 app.use(cors({
-  origin: ['http://192.168.1.18:3000', 'http://127.0.0.1:3000'],
+  origin: ['http://192.168.1.18:3000', 'http://127.0.0.1:3000','192.168.1.18'],
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
