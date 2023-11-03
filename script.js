@@ -1,125 +1,161 @@
-const btnAwait = document.getElementById('btnAwait')
-const btnPormise = document.getElementById('btnPromise');
+
+
+const btnAwait = document.getElementById('btnAwait');
+const btnPromise = document.getElementById('btnPromise');
 const btnGetUsers = document.getElementById('btnGetUsers');
 const btnDelete = document.getElementById('btnDelete');
+const userList = document.getElementById('userList');
+let users = [];
+let listUsers = [];
 
-let promesse = undefined; 
-function promess(){
-  let notreSuperPromes = new Promise((resolve, reject) => {
-    // code de la promesse
-    console.log("début de la promesse"); 
+let promesse = undefined;
+function promess() {
+  let notreSuperPromesse = new Promise((resolve, reject) => {
+    // Code de la promesse
+    console.log("Début de la promesse");
     setTimeout(() => {
-      // la promesse sera terminé au bout de 2 seconde
-      console.log("c'est la fin"); 
-      if (window.confirm("entrer dans le systeme ? ")) {
-        resolve("Webman"); 
+      // La promesse sera terminée au bout de 2 secondes
+      console.log("C'est la fin");
+      if (window.confirm("Entrer dans le système ? ")) {
+        resolve("Webman");
+      } else {
+        reject("Error Fatal");
       }
-      else {
-        reject("Error Fatal"); 
-      }
-    }, 2000); 
-    
-  
-  }); 
-  return notreSuperPromes
+    }, 2000);
+  });
+  return notreSuperPromesse;
 }
-function theDelete(){
+
+function theDelete() {
   let notreFonctionDelete = new Promise((resolve, reject) => {
-    // code de la promesse
-    console.log("début de la supression"); 
+    // Code de la promesse
+    console.log("Début de la suppression");
     setTimeout(() => {
-      // la promesse sera terminé au bout de 2 seconde
-      
-      if (window.confirm("voulez vous effacer les utilisateurs ? ")) {
-        resolve( request = new Request("http://localhost:3000/users"  ,{method: "DELETE"})); 
+      // La promesse sera terminée au bout de 2 secondes
+      if (window.confirm("Voulez-vous effacer les utilisateurs ? ")) {
+        fetch("http://localhost:3000/users", { method: "DELETE" })
+          .then(response => {
+            if (response.ok) {
+              resolve("Les utilisateurs ont été effacés avec succès");
+            } else {
+              reject("Erreur lors de la suppression des utilisateurs");
+            }
+          })
+          .catch(error => {
+            reject("Erreur lors de la suppression des utilisateurs : " + error.message);
+          });
+      } else {
+        reject("Vos données n'ont pas été effacées !");
       }
-      else {
-        reject("vos données ne sont pas effacer !"); 
-      }
-    }, 2000); 
-    
-  
-  }); 
-  return notreFonctionDelete
+    }, 2000);
+  });
+  return notreFonctionDelete;
 }
+// function fetch qui retourn automatiquement une request
+// la creation d'une new request peut etre utile si on a des besoin speciphique .ex: le headears ou body..
+// function theDelete() {
+//   let notreFonctionDelete = new Promise((resolve, reject) => {
+//     // Code de la promesse
+//     console.log("Début de la suppression");
+//     setTimeout(() => {
+//       // La promesse sera terminée au bout de 2 secondes
+//       if (window.confirm("Voulez-vous effacer les utilisateurs ? ")) {
+//         resolve(request = new Request("http://localhost:3000/users", { method: "DELETE" }));
+//         console.log("Requête HTTP");
+//       } else {
+//         reject("Vos données n'ont pas été effacées !");
+//       }
+//     }, 2000);
+//   });
+//   return notreFonctionDelete;
+// }
 
-btnPormise.addEventListener('click',()=>{
-  // on fait joujou 
-  let thePromesse = promess(); 
-  thePromesse.then(result => console.log(`bienvenue ${result}`));
-  //result webman
-  thePromesse.catch(error =>console.error(`redemarrer le pc ${error}`))
-  //reject error fatal
-  
-})
-btnDelete.addEventListener('click',()=>{
-  // on fait joujou 
-  let theDelete = theDelete(); 
-  theDelete.then(result => console.log(`effacement`));
-  //result webman
-  theDelete.catch(error =>console.error(`erreur ${error}`))
-  //reject error fatal
-  
-})
-
-async function notreSuperFonction() {
-  let result = await promess(); 
-  console.log(result); 
-  if (window.confirm("veut tu faire planter le programme")) {
-    throw new Error("Plantage, va lancer un rejet de la promise"); 
-    //si oui  alors plantage system volontaire
-  }
-  // throw new Error("Error Fatal"); // je suis dans une fonction Async 
-  return result; // ici le resolve 
-};
-
-btnAwait.addEventListener('click' ,()=>{
-  console.log("click sur Await"); 
-  let devine = notreSuperFonction();
-  // encapsule dans une variable pour applique  de s methode js  pour exemple = .then 
-  console.log(`la réponse est : ${devine}`); 
-  //cela  va retourner [objet promess]
-  devine.then(titi => console.log(` ${titi} refuse le plantage`));  //  (resolve)  de la promess() = webman
-  devine.catch(error => console.log(`error: ${error}`)) // si une erreur se produit dans la fonction async (reject)
-  try {
-    // ici du code qui peu potentionemenbt faire planter le programme 
-    //on provoque une erreur
-    throw new Error("Erreur programme"); // on fait une erreur volontaire pour la démo. 
-  }
-  catch (error) {
-    console.log(`une erreur c'est produit est attraper: voici l'erreur  + ${error.message}`); 
-    //on recupere l 'erreur  => erreur programme
-  }
-  finally {
-    // executer dans tous les cas 
-  }
-  devine.catch(toto => console.log(toto));
-  //code erreur de la promess = notreSuperPromes = reject =>erreur fatal
-})
-
-btnGetUsers.addEventListener('click', () => {
-  // click sur le bouton
-  console.log("click sur le bouton"); 
-  promesse = fetch("http://127.0.0.1:3000/users"); 
-
-  console.log(promesse); 
-
-  promesse.then(data => {
-    // code executer quand la promess est accomplie 
-    console.log("la promesse est accomplie "); 
-  }); 
-
-  promesse.catch(error => {
-    console.log("code executer en cas de rejet"); 
-    //en cas de error du fetch exemple ="ht://127.0.0.1:3000/titi"
-  }); 
-
-  promesse.finally(() => {
-   //code executer dans tous les cas: accompli ou rejet
-    console.log("fermeture du test"); 
-  })
-
-
-  
+btnPromise.addEventListener('click', () => {
+  // On fait joujou
+  let thePromesse = promess();
+  thePromesse.then(result => console.log(`Bienvenue ${result}`));
+  // Résultat : "Bienvenue Webman"
+  thePromesse.catch(error => console.error(`Redémarrer le PC ${error}`));
+  // Rejet : "Redémarrer le PC Error Fatal"
 });
 
+btnDelete.addEventListener('click', () => {
+  // On fait joujou
+  let theDeleted = theDelete();
+  theDeleted.then(result => console.log(`Effacement : ${result}`));
+  // Résultat : "Effacement : [object Request]"
+  theDeleted.catch(error => console.error(`Erreur : ${error}`));
+  // Rejet : "Erreur : Vos données n'ont pas été effacées !"
+});
+
+async function notreSuperFonction() {
+  let result = await promess();
+  console.log(result);
+  if (window.confirm("Voulez-vous faire planter le programme ?")) {
+    throw new Error("Plantage, va lancer un rejet de la promesse");
+    // Si oui, alors plantage système volontaire
+  }
+  // throw new Error("Error Fatal"); // Je suis dans une fonction async
+  return result; // Ici, le resolve
+}
+
+btnAwait.addEventListener('click', async () => {
+  console.log("Click sur Await");
+  try {
+    let devine = await notreSuperFonction();
+    console.log(`La réponse est : ${devine}`);
+    // Cela va retourner l'objet promesse
+  } catch (error) {
+    console.log(`Une erreur s'est produite et a été attrapée : ${error.message}`);
+    
+    // On récupère l'erreur => "Erreur programme"
+  } finally {
+    // Exécuter dans tous les cas
+  }
+});
+async function getAllUsers () {
+let response = await fetch("http://127.0.0.1:3000/users",
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  users = await response.json();
+ 
+  users.forEach(user => listUsers.push(`<li>${user.username}</li>`))
+    console.log("listUsers", listUsers);
+    userList.innerHTML = `${listUsers.join("")}`
+   
+}
+
+
+
+btnGetUsers.addEventListener('click', async () => {
+  // Click sur le bouton
+
+  console.log("Click sur le bouton");
+  getAllUsers();
+  
+
+
+});
+// console.log(listUsers);
+  // userList.innerHTML = `toto ${users.username}`
+
+  // console.log(promesse);
+
+  // promesse.then(data => {
+  //   // Code exécuté quand la promesse est accomplie
+  //   console.log("La promesse est accomplie ",data);
+  // });
+
+  // promesse.catch(error => {
+  //   console.log("Code exécuté en cas de rejet");
+  //   // En cas d'erreur du fetch, par exemple "http://127.0.0.1:3000/titi"
+  // });
+
+  // promesse.finally(() => {
+  //   // Code exécuté dans tous les cas : accompli ou rejet
+  //   console.log("Fermeture du test");
+  // });

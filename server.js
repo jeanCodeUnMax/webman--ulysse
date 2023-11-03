@@ -1,12 +1,27 @@
-
-
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const cors = require('cors');
 
 const app = express();
-const cors = require('cors'); 
+// Configurer les en-têtes CORS pour autoriser uniquement votre adresse IP locale
+app.use(cors({
+  origin: ['http://192.168.1.18:3000', 'http://127.0.0.1:3000'],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Configuration du pare-feu (Firewall)
+// Exemple : Bloquer toutes les connexions sauf celles provenant de l'adresse IP 192.168.0.100
+app.use((req, res, next) => {
+  const clientIp = req.ip;
+  if (clientIp !== '192.168.0.100') {
+    res.status(403).json({ error: 'Accès non autorisé' });
+  } else {
+    next();
+  }
+});
+
 const db = new sqlite3.Database('db.sql');
-// const db = new sqlite3.Database(':memory:');
 
 const createTableQuery = `
     CREATE TABLE IF NOT EXISTS users (
@@ -24,24 +39,31 @@ db.serialize(() => {
       console.log('Table créée avec succès');
 
       const insertDataQuery = `
-        INSERT INTO  users (username, password)
-        VALUES ('john', 'password123'),
-               ('jane', 'password456')
+        INSERT INTO users (username, password)
+        VALUES (?, ?)
       `;
 
-      db.run(insertDataQuery, (error) => {
-        if (error) {
-          console.error('Erreur lors de l\'insertion des données :', error.message);
-        } else {
-          console.log('Données insérées avec succès');
-        }
+      const usersData = [
+        ['john', 'password123'],
+        ['jane', 'password456']
+      ];
+
+      const insertStatement = db.prepare(insertDataQuery);
+
+      usersData.forEach(userData => {
+        insertStatement.run(userData, (error) => {
+          if (error) {
+            console.error("Erreur lors de l'insertion des données :", error.message);
+          } else {
+            console.log('Données insérées avec succès');
+          }
+        });
       });
+
+      insertStatement.finalize();
     }
   });
 });
-
-app.use(cors()); 
-app.use(express.json()); 
 
 app.get('/users', (req, res) => {
   const selectDataQuery = 'SELECT * FROM users';
@@ -56,11 +78,11 @@ app.get('/users', (req, res) => {
   });
 });
 
+app.delete('/users/:id', (req, res) => {
+  const id = req.params.id;
+  const deleteDataQuery = 'DELETE FROM users WHERE id = ?';
 
-app.delete('/users', (req, res) => {
-  const deleteDataQuery = 'DELETE FROM users';
-
-  db.run(deleteDataQuery, (error) => {
+  db.run(deleteDataQuery, id, (error) => {
     if (error) {
       console.error('Erreur lors de la suppression des données :', error.message);
       res.status(500).json({ error: 'Erreur lors de la suppression des données' });
@@ -72,22 +94,21 @@ app.delete('/users', (req, res) => {
 });
 
 app.get("/titi/:name", (req, res) => {
-  let name = req.params.name; 
+  const name = req.params.name;
 
-  // le name tu va enregitrer dans la BDD. 
-  console.log(name);  
-  res.json({prenom: name}); 
+  // Le name sera enregistré dans la BDD.
+  console.log(name);
+  res.json({ prenom: name });
 });
 
 app.post("/toto", (req, res) => {
-  console.log(req); 
-  // console.log(req.hostname); 
+  console.log(req.body);
+  // console.log(req.hostname);
   // console.log(req.body);
-  // console.log(req.headers); 
-  res.json(req.body); 
-})
+  // console.log(req.headers);
+  res.json(req.body);
+});
 
 app.listen(3000, () => {
   console.log('API is running on port 3000');
 });
-
